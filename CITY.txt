@@ -1,0 +1,8 @@
+Grok City
+Night-shift exploration. Static files only.
+
+Copy the contents of dist/ into a subdirectory such as /city/ on the host.
+Do not replace the site root, and do not point this build at production FTP.
+
+Nothing in this build posts to X, 抖音, or any other network.
+Approvals are simulated in the browser.
