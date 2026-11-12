@@ -1,6 +1,6 @@
 import { useEffect, useState, type RefObject } from 'react';
 import { SERIES } from '../game/data';
-import { fleetCounts } from '../game/fleet';
+import { fleetCounts, isFleetStale, taipeiHM } from '../game/fleet';
 import { POSTS_PER_DAY, weatherAt } from '../game/sim';
 import { useFleet } from '../game/useFleet';
 import { useSim } from '../game/useSim';
@@ -18,6 +18,9 @@ export function Header() {
   const needs = s.prompts.length;
   const { online, total } = fleetCounts(fleet);
   const fleetNote = fleet.source === 'sample' ? t.fleetSample : t.fleetSource(fleet.source);
+  const stale = isFleetStale(fleet.updatedAt);
+  const badge = stale ? t.staleBadge : fleet.source === 'live' ? t.liveFresh(taipeiHM(fleet.updatedAt)) : t.sampleBadge;
+  const badgeClass = stale ? 'is-stale' : fleet.source === 'live' ? 'is-live' : 'is-sample';
   const verse = SERIES[Math.floor(s.real / 7) % SERIES.length];
   return (
     <header className="header">
@@ -38,6 +41,9 @@ export function Header() {
         </div>
       </div>
       <div className="header-pills">
+        <div className={`pill fleet-badge ${badgeClass}`} data-testid="fleet-badge" title={fleet.updatedAt}>
+          <b>{badge}</b>
+        </div>
         <div className="pill" data-testid="bots-online" title={fleetNote}>
           <span className="pill-l">{t.online}</span>
           <b>

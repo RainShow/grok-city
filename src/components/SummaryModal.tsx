@@ -1,18 +1,21 @@
 import { AGENTS } from '../game/data';
 import { useSim } from '../game/useSim';
 import { formatClock, formatCompact } from '../format';
-import { agentName } from '../i18n/copy';
+import { agentLabel } from '../i18n/copy';
+import { useFleet } from '../game/useFleet';
 import { useI18n } from '../i18n/lang';
 import { BotIcon } from './BotIcon';
 
 export function SummaryModal() {
   const sim = useSim();
+  const fleet = useFleet();
   const { lang, t } = useI18n();
+  const names = fleet.bots.map((bot) => bot.name);
   const s = sim.state;
   if (!s.summaryOpen) return null;
   const m = s.metrics;
   const mvp = AGENTS.reduce((best, d) => (s.agents[d.id].doneToday > s.agents[best.id].doneToday ? d : best), AGENTS[0]);
-  const mvpName = agentName(lang, mvp.id);
+  const mvpName = agentLabel(lang, mvp.id, names);
   return (
     <div className="modal-backdrop" onClick={() => sim.closeSummary()}>
       <div className="modal" role="dialog" aria-label={t.summaryAria} onClick={(e) => e.stopPropagation()}>
@@ -34,7 +37,7 @@ export function SummaryModal() {
           {AGENTS.map((d) => (
             <div key={d.id} className={d.id === mvp.id ? 'mvp' : ''}>
               <BotIcon def={d} size={22} />
-              <span>{agentName(lang, d.id)}</span>
+              <span>{agentLabel(lang, d.id, names)}</span>
               <b>{s.agents[d.id].doneToday}</b>
             </div>
           ))}

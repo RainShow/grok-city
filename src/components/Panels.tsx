@@ -3,7 +3,8 @@ import { AGENT_BY_ID, SERIES, STAGES, topicMeta } from '../game/data';
 import { useSim } from '../game/useSim';
 import { formatClock, formatCompact } from '../format';
 import { POSTS_PER_DAY, type Prompt, type SimState } from '../game/sim';
-import { agentName, featuring, say, seriesName, seriesVerse, stageLabel, storyDraft, storyTitle } from '../i18n/copy';
+import { agentLabel, featuring, say, seriesName, seriesVerse, stageLabel, storyDraft, storyTitle } from '../i18n/copy';
+import { useFleet } from '../game/useFleet';
 import { useI18n } from '../i18n/lang';
 
 export function LeftPanel() {
@@ -48,6 +49,7 @@ function NeedsYou() {
 
 function PromptCard({ p, onPick }: { p: Prompt; onPick: (i: number, note?: string) => void }) {
   const sim = useSim();
+  const fleet = useFleet();
   const { lang, t } = useI18n();
   const agent = p.kind === 'hook' ? AGENT_BY_ID.pumpkin : AGENT_BY_ID.grok;
   const story = sim.state.story?.id === p.storyId ? sim.state.story : undefined;
@@ -58,7 +60,7 @@ function PromptCard({ p, onPick }: { p: Prompt; onPick: (i: number, note?: strin
     <div className={`prompt-card kind-${p.kind}`}>
       <div className="prompt-head">
         <span className="dot" style={{ background: agent.color }} />
-        <span className="prompt-from">{agentName(lang, agent.id)}</span>
+        <span className="prompt-from">{agentLabel(lang, agent.id, fleet.bots.map((bot) => bot.name))}</span>
         <span className="prompt-role">{p.kind === 'hook' ? t.sevenDoors : t.atGate}</span>
         {p.ttl > 0 && <span className="prompt-ttl">{Math.ceil(p.ttl)}s</span>}
       </div>
@@ -127,7 +129,9 @@ function PromptCard({ p, onPick }: { p: Prompt; onPick: (i: number, note?: strin
 
 function Activity() {
   const sim = useSim();
+  const fleet = useFleet();
   const { lang, t } = useI18n();
+  const names = fleet.bots.map((bot) => bot.name);
   return (
     <section className="section activity">
       <h2>
@@ -138,7 +142,7 @@ function Activity() {
       <ol className="log">
         {sim.state.log.map((e) => {
           const color = e.who === 'you' ? '#c4f93e' : e.who === 'city' ? '#8b959e' : AGENT_BY_ID[e.who].color;
-          const name = e.who === 'you' ? t.whoYou : e.who === 'city' ? t.whoCity : agentName(lang, e.who);
+          const name = e.who === 'you' ? t.whoYou : e.who === 'city' ? t.whoCity : agentLabel(lang, e.who, names);
           return (
             <li key={e.id} className={`log-item who-${e.who}`}>
               <span className="log-time">{formatClock(e.clock)}</span>
@@ -164,7 +168,9 @@ function stageRows(s: SimState) {
 
 function Pipeline() {
   const sim = useSim();
+  const fleet = useFleet();
   const { lang, t } = useI18n();
+  const names = fleet.bots.map((bot) => bot.name);
   const s = sim.state;
   const story = s.story;
   const rows = stageRows(s);
@@ -200,7 +206,7 @@ function Pipeline() {
             <span className="stage-label">{stageLabel(lang, row.key)}</span>
             <span className="chip">
               <span className="dot" style={{ background: row.color }} />
-              {agentName(lang, row.agent)}
+              {agentLabel(lang, row.agent, names)}
             </span>
             <span className="stage-count">{row.count}</span>
           </li>

@@ -1,14 +1,15 @@
 import { memo, useMemo, type ReactNode } from 'react';
-import { AGENTS, type AgentDef } from '../../game/data';
 import { N, P, proj, pts, rotPt, rotRect, shade, type Pt } from '../../game/iso';
-import { agentMode, nightAt, type AgentState } from '../../game/sim';
+import { nightAt } from '../../game/sim';
+import type { ActivityStatus, FleetBot } from '../../game/fleet';
+import { useFleet } from '../../game/useFleet';
 import { useSim, useSimFrame } from '../../game/useSim';
 import {
   BILLBOARD, BUILDINGS, CONVEYORS, FILLERS, LAMPS, PUMPKIN, SERIES_GATES, TREES, isPlaza, isRoad, type Building, type BuildingId,
 } from '../../game/world';
 import { Lamp, StructureView, Tree } from './structures';
 import { formatCompact } from '../../format';
-import { agentName, buildingName, buildingTag, say, seriesName, signFor } from '../../i18n/copy';
+import { buildingName, buildingTag, say, seriesName, signFor } from '../../i18n/copy';
 import { useI18n } from '../../i18n/lang';
 
 const INK = '#0c1014';
@@ -289,47 +290,73 @@ function Billboard({ rot }: { rot: number }) {
   );
 }
 
-function agentScreen(a: AgentState, rot: number, t: number, idx: number) {
-  let x: number;
-  let y: number;
-  let hop = 0;
-  if (a.path) {
-    const k = Math.min(a.path.length - 1, Math.floor(a.pos));
-    const n = Math.min(a.path.length - 1, k + 1);
-    const f = a.pos - k;
-    x = a.path[k][0] + (a.path[n][0] - a.path[k][0]) * f + 0.5;
-    y = a.path[k][1] + (a.path[n][1] - a.path[k][1]) * f + 0.5;
-    hop = Math.abs(Math.sin(a.pos * Math.PI)) * 11;
-  } else {
-    x = a.tile[0] + 0.5;
-    y = a.tile[1] + 0.5;
-    hop = Math.abs(Math.sin(t * 2.2 + idx)) * (agentMode(a) === 'working' ? 4 : 1.5);
-  }
-  const off = [[-0.22, -0.2], [0.22, -0.18], [-0.2, 0.22], [0.2, 0.2], [0, -0.3], [0, 0.3]][idx];
-  const p = P(x + off[0], y + off[1], 0, rot);
-  return { x: p.x, y: p.y, hop };
+const SEATS: [number, number][] = [
+  [0.18, 0.42],
+  [-0.42, 0.22],
+  [0.48, -0.18],
+  [-0.22, -0.46],
+  [0.62, 0.55],
+];
+
+function bodyShape(shape?: string): 'pill' | 'ghost' | 'tri' {
+  if (shape === 'blob' || shape === 'pumpkin' || shape === 'teardrop' || shape === 'flower') return 'ghost';
+  if (shape === 'crystal' || shape === 'wedge' || shape === 'sparkle' || shape === 'clover') return 'tri';
+  return 'pill';
 }
 
-function Bot({ def, mode }: { def: AgentDef; mode: string }) {
-  const c = def.color;
+function fleetPose(bot: FleetBot, index: number, rot: number, t: number) {
+  const activity: ActivityStatus = bot.activityStatus ?? 'idle';
+  const home = BUILDINGS[index % BUILDINGS.length];
+  const seat = SEATS[Math.floor(index / BUILDINGS.length) % SEATS.length];
+  const deskX = home.door[0] + 0.5 + seat[0];
+  const deskY = home.door[1] + 0.5 + seat[1];
+  let x = deskX;
+  let y = deskY;
+  let hop = 0;
+  if (activity === 'active') {
+    const period = 7 + (index % 4);
+    const phase = ((t / period) + index * 0.17) % 1;
+    const leg = phase < 0.46 ? phase / 0.46 : phase > 0.54 ? (1 - phase) / 0.46 : 1;
+    const f = Math.max(0, Math.min(1, leg));
+    const smooth = f * f * (3 - 2 * f);
+    const dx = 6.5 - home.door[0];
+    const dy = 6.5 - home.door[1];
+    const len = Math.hypot(dx, dy) || 1;
+    const toX = home.door[0] + 0.5 + (dx / len) * 1.8;
+    const toY = home.door[1] + 0.5 + (dy / len) * 1.8;
+    x = deskX + (toX - deskX) * smooth;
+    y = deskY + (toY - deskY) * smooth;
+    hop = Math.abs(Math.sin(smooth * Math.PI)) * 11;
+  } else if (activity === 'recent') {
+    hop = Math.abs(Math.sin(t * 1.3 + index)) * 2.2;
+  }
+  const p = P(x, y, 0, rot);
+  const desk = P(deskX, deskY, 0, rot);
+  return { x: p.x, y: p.y, hop, home, activity, desk };
+}
+
+function CityBot({ bot, activity }: { bot: FleetBot; activity: ActivityStatus }) {
+  const c = bot.color ?? '#8b959e';
+  const shape = bodyShape(bot.avatarShape);
   const body =
-    def.shape === 'pill' ? (
+    shape === 'pill' ? (
       <rect x={-11} y={-27} width={22} height={25} rx={10} fill={c} stroke={INK} strokeWidth={1.6} />
-    ) : def.shape === 'ghost' ? (
+    ) : shape === 'ghost' ? (
       <path d="M-11,-3 V-16 a11,11 0 0 1 22,0 V-3 l-3.7,3 -3.7,-3 -3.6,3 -3.7,-3 -3.6,3 z" fill={c} stroke={INK} strokeWidth={1.6} strokeLinejoin="round" />
     ) : (
       <path d="M0,-29 L13,-2 H-13 Z" fill={c} stroke={INK} strokeWidth={1.6} strokeLinejoin="round" />
     );
-  const eyesY = def.shape === 'tri' ? -12 : -17;
+  const eyesY = shape === 'tri' ? -12 : -17;
   return (
     <g>
+      {activity === 'active' && <ellipse cx={0} cy={2} rx={16} ry={6} fill={c} opacity={0.35} className="pulse" />}
       <ellipse cx={0} cy={1} rx={11} ry={4} fill="#05070a" opacity={0.45} />
       {body}
       <ellipse cx={-6} cy={-21} rx={3} ry={2} fill={shade(c, 0.45)} opacity={0.7} />
-      {mode === 'waiting' ? (
-        <g stroke="#fff" strokeWidth={2} strokeLinecap="round">
-          <line x1={-6} y1={eyesY + 2} x2={-2} y2={eyesY + 2} />
-          <line x1={2} y1={eyesY + 2} x2={6} y2={eyesY + 2} />
+      {activity === 'idle' ? (
+        <g stroke="#d7e2ea" strokeWidth={1.6} strokeLinecap="round" opacity={0.7}>
+          <line x1={-5} y1={eyesY + 2} x2={-2} y2={eyesY + 2} />
+          <line x1={2} y1={eyesY + 2} x2={5} y2={eyesY + 2} />
         </g>
       ) : (
         <g fill="#fff">
@@ -347,24 +374,19 @@ function textWidth(text: string, lang: string) {
 
 function Dynamic({ rot, labels }: { rot: number; labels: boolean }) {
   const sim = useSimFrame();
+  const fleet = useFleet();
   const { lang } = useI18n();
   const s = sim.state;
   const t = s.real;
-  const positions = AGENTS.map((d, i) => ({ d, a: s.agents[d.id], ...agentScreen(s.agents[d.id], rot, t, i) }));
+  const positions = fleet.bots.map((bot, i) => ({ bot, ...fleetPose(bot, i, rot, t) }));
 
   const paths = positions
-    .filter((p) => p.a.path)
-    .map(({ d, a, x, y }) => {
-      const rest = a.path!.slice(Math.floor(a.pos) + 1).map(([i, j]) => P(i + 0.5, j + 0.5, 0, rot));
-      const all = [{ x, y }, ...rest];
-      const end = all[all.length - 1];
-      return (
-        <g key={`p-${d.id}`}>
-          <polyline points={pts(all)} fill="none" stroke={d.color} strokeWidth={2.6} strokeDasharray="0.1 7" strokeLinecap="round" opacity={0.85} />
-          <ellipse cx={end.x} cy={end.y} rx={12} ry={6} fill="none" stroke={d.color} strokeWidth={1.5} strokeDasharray="3 3" />
-        </g>
-      );
-    });
+    .filter((p) => p.activity === 'active')
+    .map(({ bot, x, y, desk }) => (
+      <g key={`p-${bot.id}`}>
+        <polyline points={pts([{ x: desk.x, y: desk.y }, { x, y }])} fill="none" stroke={bot.color ?? '#c4f93e'} strokeWidth={2.2} strokeDasharray="0.1 7" strokeLinecap="round" opacity={0.8} />
+      </g>
+    ));
 
   const bubble = s.activeBubble;
   let bubbleEl: ReactNode = null;
@@ -392,33 +414,19 @@ function Dynamic({ rot, labels }: { rot: number; labels: boolean }) {
       {positions
         .slice()
         .sort((a, b) => a.y - b.y)
-        .map(({ d, a, x, y, hop }) => {
-          const mode = agentMode(a);
-          const name = agentName(lang, d.id);
+        .map(({ bot, x, y, hop, activity }) => {
+          const name = bot.name;
           const wide = [...name].some((ch) => ch.charCodeAt(0) > 255);
           const w = wide ? [...name].length * 14 + 28 : name.length * 7.2 + 28;
           return (
-            <g key={d.id} transform={`translate(${x.toFixed(1)} ${y.toFixed(1)})`} className={`agent agent-${mode}`}>
+            <g key={bot.id} transform={`translate(${x.toFixed(1)} ${y.toFixed(1)})`} className={`agent agent-live-${activity}`}>
               <g transform={`translate(0 ${-hop})`}>
-                <Bot def={d} mode={mode} />
-                {a.carrying && (
-                  <g transform="translate(0 -36)">
-                <rect x={-7} y={-8} width={14} height={10} rx={1} fill="#d5e4f2" stroke={INK} strokeWidth={0.8} />
-                <line x1={0} y1={-8} x2={0} y2={2} stroke="#1a2026" strokeWidth={1} />
-                  </g>
-                )}
-                {mode === 'working' && (
-                  <g className="typing" transform="translate(14 -30)">
-                    <circle cx={0} cy={0} r={1.8} fill={INK} />
-                    <circle cx={5} cy={0} r={1.8} fill={INK} />
-                    <circle cx={10} cy={0} r={1.8} fill={INK} />
-                  </g>
-                )}
+                <CityBot bot={bot} activity={activity} />
               </g>
               {labels && (
-                <g transform={`translate(0 ${a.carrying ? -66 : -50})`}>
+                <g transform="translate(0 -50)">
                   <rect x={-w / 2} y={-9} width={w} height={17} rx={2} fill="#0b0d10e6" stroke="rgba(232,236,239,0.28)" strokeWidth={0.8} />
-                  <circle cx={-w / 2 + 9} cy={-0.5} r={3.5} fill={d.color} />
+                  <circle cx={-w / 2 + 9} cy={-0.5} r={3.5} fill={bot.color ?? '#8b959e'} />
                   <text x={-w / 2 + 17} y={3.5} className="nametag">{name}</text>
                 </g>
               )}
@@ -432,9 +440,8 @@ function Dynamic({ rot, labels }: { rot: number; labels: boolean }) {
 }
 
 function Callout({ b, rot }: { b: Building; rot: number }) {
-  const sim = useSim();
+  const fleet = useFleet();
   const { lang, t } = useI18n();
-  const s = sim.state;
   const r = rotRect(b.x0, b.y0, b.x1, b.y1, rot);
   const extra = b.kind === 'house' ? 44 : b.kind === 'bank' ? 28 : 10;
   const anchor = proj((r.x0 + r.x1) / 2, (r.y0 + r.y1) / 2, b.h + extra);
@@ -453,16 +460,22 @@ function Callout({ b, rot }: { b: Building; rot: number }) {
   }
   bx = Math.max(-420, Math.min(420 - w, bx));
   by = Math.max(-245, Math.min(400, by));
-  const here = AGENTS.filter((d) => s.agents[d.id].at === b.id && !s.agents[d.id].path);
-  const working = here.find((d) => agentMode(s.agents[d.id]) === 'working');
-  const waiting = here.find((d) => agentMode(s.agents[d.id]) === 'waiting');
-  const statusAgent = waiting ?? working;
-  const status = waiting ? say(lang, { id: 'needsYou' }) : working ? say(lang, s.agents[working.id].status) : here.length ? say(lang, { id: 'inside', n: here.length }) : say(lang, { id: 'quiet' });
-  const dot = waiting ? '#c4f93e' : working ? '#c5d8ea' : '#5c656e';
+  const here = fleet.bots.filter((_, i) => BUILDINGS[i % BUILDINGS.length].id === b.id);
+  const lead = [...here].sort((a, c) => {
+    const rank = (bot: FleetBot) => (bot.activityStatus === 'active' ? 0 : bot.activityStatus === 'recent' ? 1 : 2);
+    return rank(a) - rank(c);
+  })[0];
+  const status = !lead
+    ? say(lang, { id: 'quiet' })
+    : lead.activityStatus === 'active'
+      ? `${lead.name} · ${lead.topic ?? t.onStreet}`
+      : lead.activityStatus === 'recent'
+        ? `${lead.name} · ${lead.topic ?? t.onStreet}`
+        : `${lead.name} · ${t.atDesk}`;
+  const dot = lead?.activityStatus === 'active' ? '#c4f93e' : lead?.activityStatus === 'recent' ? '#c5d8ea' : '#5c656e';
   const elbowX = anchor.x < bx ? bx : anchor.x > bx + w ? bx + w : anchor.x;
   const elbowY = anchor.x >= bx && anchor.x <= bx + w ? by + 66 : by + 13;
-  const who = statusAgent ? agentName(lang, statusAgent.id) : '';
-  const full = `${who ? who + ' · ' : ''}${status}`;
+  const full = status;
   const pillText = lang === 'zh' ? [...full].slice(0, 16).join('') : full.slice(0, 34);
   const pw = (lang === 'zh' ? [...pillText].length * 11 : pillText.length * 6.2) + 24;
   return (
@@ -475,7 +488,7 @@ function Callout({ b, rot }: { b: Building; rot: number }) {
         <text x={5} y={8} className="callout-no">{t.noLabel} {b.no}</text>
         <text x={w / 2} y={20} textAnchor="middle" className="callout-name">{buildingName(lang, b.id)}</text>
         <text x={w / 2} y={40} textAnchor="middle" className="callout-tag">{buildingTag(lang, b.id)}</text>
-        <g transform={`translate(${(w - pw) / 2} 48)`} className={waiting ? 'pulse' : undefined}>
+        <g transform={`translate(${(w - pw) / 2} 48)`} className={lead?.activityStatus === 'active' ? 'pulse' : undefined}>
           <rect width={pw} height={16} rx={2} fill="#10141a" stroke="rgba(232,236,239,0.16)" strokeWidth={0.7} />
           <circle cx={9} cy={8} r={3.2} fill={dot} />
           <text x={16} y={11.5} className="callout-pill">{pillText}</text>

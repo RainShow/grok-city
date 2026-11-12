@@ -112,6 +112,21 @@ export function storyTitle(lang: Lang, id: TopicId) {
 export function agentName(lang: Lang, id: AgentId) {
   return AGENT_COPY[id][lang];
 }
+
+const PIPELINE_BOT: Record<AgentId, readonly string[]> = {
+  proto: ['开发'],
+  pumpkin: ['运营'],
+  analysis: ['动态', '行业分析'],
+  grok: ['Grok'],
+  design: ['设计'],
+  post: ['发文'],
+};
+
+/** Visible stand-in for the simulated night-shift roles, when that bot is in the fleet. */
+export function agentLabel(lang: Lang, id: AgentId, names: readonly string[]) {
+  const hit = PIPELINE_BOT[id].find((name) => names.includes(name));
+  return hit ?? agentName(lang, id);
+}
 export function agentRole(lang: Lang, id: AgentId) {
   return lang === 'zh' ? AGENT_COPY[id].roleZh : AGENT_COPY[id].roleEn;
 }
@@ -251,6 +266,9 @@ export interface Dict {
   whichDoor: string;
   gateAsk: string;
   roster: string;
+  rosterPrev: string;
+  rosterNext: string;
+  rosterPage: (n: number, m: number) => string;
   statusIdle: string;
   statusBusy: string;
   statusNeeds: string;
@@ -260,6 +278,12 @@ export interface Dict {
   copiedId: string;
   fleetSample: string;
   fleetSource: (source: string) => string;
+  liveFresh: (hm: string) => string;
+  sampleBadge: string;
+  staleBadge: string;
+  hiddenTag: string;
+  msgs24h: (n: number) => string;
+  atDesk: string;
   webOpen: string;
   pumpkinBtn: string;
   approve: string;
@@ -388,6 +412,9 @@ const zh: Dict = {
   autoLine: (n) => `城自己拿的主意：${n}。没有一条真的发出去。`,
   mvp: (name) => `今晚最忙的是${name}。灯还亮着，proto 还在翻。`,
   roster: '花名册',
+  rosterPrev: '上一页',
+  rosterNext: '下一页',
+  rosterPage: (n, m) => `${n} / ${m}`,
   statusIdle: '空闲',
   statusBusy: '忙碌',
   statusNeeds: '需要你',
@@ -397,6 +424,12 @@ const zh: Dict = {
   copiedId: '已复制',
   fleetSample: '数据：fleet.json（样例）',
   fleetSource: (source) => `数据：fleet.json（${source}）`,
+  liveFresh: (hm) => `实时 · 更新于 ${hm}`,
+  sampleBadge: 'Sample',
+  staleBadge: '数据已过期',
+  hiddenTag: '隐藏',
+  msgs24h: (n) => `24h · ${n}`,
+  atDesk: '在工位',
   webOpen: '打开网页',
   keepWatching: '继续看',
   noLabel: '编号',
@@ -479,6 +512,9 @@ const en: Dict = {
   autoLine: (n) => `Decisions the city made without you: ${n}. Nothing was actually posted.`,
   mvp: (name) => `Busiest tonight: ${name}. The lights stay on. proto keeps reading.`,
   roster: 'Roster',
+  rosterPrev: 'Previous bots',
+  rosterNext: 'Next bots',
+  rosterPage: (n, m) => `${n} / ${m}`,
   statusIdle: 'Idle',
   statusBusy: 'Busy',
   statusNeeds: 'Needs you',
@@ -488,6 +524,12 @@ const en: Dict = {
   copiedId: 'Copied',
   fleetSample: 'Data: fleet.json (sample)',
   fleetSource: (source) => `Data: fleet.json (${source})`,
+  liveFresh: (hm) => `Live · updated ${hm}`,
+  sampleBadge: 'Sample',
+  staleBadge: 'Data is stale',
+  hiddenTag: 'hidden',
+  msgs24h: (n) => `${n} / 24h`,
+  atDesk: 'at the desk',
   webOpen: 'Open page',
   keepWatching: 'Keep watching',
   noLabel: 'no.',

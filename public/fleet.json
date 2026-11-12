@@ -1,6 +1,7 @@
 {
-  "updatedAt": "2026-11-06T01:23:30Z",
-  "source": "sample",
+  "updatedAt": "2026-11-12T16:48:23+08:00",
+  "generatedAt": "2026-11-12T16:48:23+08:00",
+  "source": "live",
   "bots": [
     {
       "id": "b5c4d18e-58e4-4978-874c-5e9c92fd3ed0",
@@ -8,31 +9,59 @@
       "role": "想法 → draft PR",
       "status": "busy",
       "deepLink": "grokbot://app/v1/agent?id=b5c4d18e-58e4-4978-874c-5e9c92fd3ed0",
-      "color": "#9b7ed9"
+      "color": "#9b7ed9",
+      "activityStatus": "active",
+      "messages24h": 7,
+      "routines": [],
+      "lastActiveAt": "2026-11-12T16:48:07+08:00",
+      "topic": "原型构建",
+      "avatarShape": "crystal",
+      "avatarColor": "violet"
     },
     {
       "id": "80f758ee-d069-4648-96e6-97690be82cd0",
       "name": "Grok",
       "role": "主协调",
-      "status": "busy",
+      "status": "idle",
       "deepLink": "grokbot://app/v1/agent?id=80f758ee-d069-4648-96e6-97690be82cd0",
-      "color": "#c5ced8"
+      "color": "#c5ced8",
+      "activityStatus": "recent",
+      "messages24h": 39,
+      "routines": [],
+      "lastActiveAt": "2026-11-12T13:18:02+08:00",
+      "topic": "团队协调",
+      "avatarShape": "blob",
+      "avatarColor": "black"
     },
     {
       "id": "eb8e147a-16fb-4000-807f-6909ea9bd9a4",
       "name": "运营",
       "role": "内容/发帖准备",
-      "status": "needs_you",
+      "status": "idle",
       "deepLink": "grokbot://app/v1/agent?id=eb8e147a-16fb-4000-807f-6909ea9bd9a4",
-      "color": "#e8a05c"
+      "color": "#e8a05c",
+      "activityStatus": "recent",
+      "messages24h": 47,
+      "routines": [],
+      "lastActiveAt": "2026-11-12T11:41:46+08:00",
+      "topic": "内容准备",
+      "avatarShape": "pumpkin",
+      "avatarColor": "orange"
     },
     {
       "id": "484dfc32-dfa6-4405-87a8-acab119580ae",
-      "name": "行业分析",
+      "name": "动态",
       "role": "晨间 digest",
       "status": "idle",
       "deepLink": "grokbot://app/v1/agent?id=484dfc32-dfa6-4405-87a8-acab119580ae",
-      "color": "#e07070"
+      "color": "#e07070",
+      "activityStatus": "recent",
+      "messages24h": 1,
+      "routines": [],
+      "lastActiveAt": "2026-11-12T09:52:44+08:00",
+      "topic": "晨报",
+      "avatarShape": "tablet",
+      "avatarColor": "red"
     },
     {
       "id": "f17f8b85-bef6-4305-af4f-a39dd923a37e",
@@ -40,15 +69,30 @@
       "role": "设计",
       "status": "idle",
       "deepLink": "grokbot://app/v1/agent?id=f17f8b85-bef6-4305-af4f-a39dd923a37e",
-      "color": "#6b9bd1"
+      "color": "#6b9bd1",
+      "activityStatus": "recent",
+      "messages24h": 12,
+      "routines": [],
+      "lastActiveAt": "2026-11-12T16:21:05+08:00",
+      "topic": "设计",
+      "avatarShape": "flower",
+      "avatarColor": "blue",
+      "hiddenFromSidebar": true
     },
     {
       "id": "332d89ba-38d9-4f9b-bde2-9067ac55b91a",
-      "name": "设计调研",
+      "name": "调研",
       "role": "调研",
       "status": "idle",
       "deepLink": "grokbot://app/v1/agent?id=332d89ba-38d9-4f9b-bde2-9067ac55b91a",
-      "color": "#5ec8d8"
+      "color": "#5ec8d8",
+      "activityStatus": "idle",
+      "messages24h": 0,
+      "routines": [],
+      "lastActiveAt": "2026-11-07T11:33:11+08:00",
+      "avatarShape": "square",
+      "avatarColor": "cyan",
+      "hiddenFromSidebar": true
     },
     {
       "id": "39e11a57-6504-413e-abba-62c62ee3e6d0",
@@ -56,7 +100,14 @@
       "role": "账号注册",
       "status": "idle",
       "deepLink": "grokbot://app/v1/agent?id=39e11a57-6504-413e-abba-62c62ee3e6d0",
-      "color": "#5ec8d8"
+      "color": "#5ec8d8",
+      "activityStatus": "recent",
+      "messages24h": 60,
+      "routines": [],
+      "lastActiveAt": "2026-11-12T16:27:30+08:00",
+      "topic": "账号注册",
+      "avatarShape": "wedge",
+      "avatarColor": "cyan"
     },
     {
       "id": "828b8a1a-85e7-4d99-8fc7-4226f4ef89f9",
@@ -64,7 +115,14 @@
       "role": "问答",
       "status": "idle",
       "deepLink": "grokbot://app/v1/agent?id=828b8a1a-85e7-4d99-8fc7-4226f4ef89f9",
-      "color": "#d46bc8"
+      "color": "#d46bc8",
+      "activityStatus": "idle",
+      "messages24h": 0,
+      "routines": [],
+      "lastActiveAt": "2026-11-10T10:32:49+08:00",
+      "avatarShape": "clover",
+      "avatarColor": "magenta",
+      "hiddenFromSidebar": true
     },
     {
       "id": "cee53f32-46c9-4b54-a78e-5848f244105a",
@@ -72,7 +130,14 @@
       "role": "知识储备",
       "status": "idle",
       "deepLink": "grokbot://app/v1/agent?id=cee53f32-46c9-4b54-a78e-5848f244105a",
-      "color": "#6bbf7a"
+      "color": "#6bbf7a",
+      "activityStatus": "recent",
+      "messages24h": 4,
+      "routines": [],
+      "lastActiveAt": "2026-11-12T15:15:10+08:00",
+      "topic": "知识储备",
+      "avatarShape": "house",
+      "avatarColor": "green"
     },
     {
       "id": "fe40b69b-333f-4be2-8ff4-366b64f7289d",
@@ -80,7 +145,13 @@
       "role": "运维",
       "status": "idle",
       "deepLink": "grokbot://app/v1/agent?id=fe40b69b-333f-4be2-8ff4-366b64f7289d",
-      "color": "#e0c35c"
+      "color": "#e0c35c",
+      "activityStatus": "idle",
+      "messages24h": 0,
+      "routines": [],
+      "lastActiveAt": "2026-11-06T15:13:07+08:00",
+      "avatarShape": "hex",
+      "avatarColor": "yellow"
     },
     {
       "id": "8cde9bce-9af5-4012-859b-a2b6a7f1a472",
@@ -88,7 +159,44 @@
       "role": "建 bot",
       "status": "idle",
       "deepLink": "grokbot://app/v1/agent?id=8cde9bce-9af5-4012-859b-a2b6a7f1a472",
-      "color": "#e07070"
+      "color": "#e07070",
+      "activityStatus": "recent",
+      "messages24h": 4,
+      "routines": [],
+      "lastActiveAt": "2026-11-12T09:30:20+08:00",
+      "topic": "建 bot",
+      "avatarShape": "teardrop",
+      "avatarColor": "red"
+    },
+    {
+      "id": "81299118-6bfe-4fdc-832d-87c5d433fd89",
+      "name": "写作",
+      "role": "写作",
+      "status": "idle",
+      "deepLink": "grokbot://app/v1/agent?id=81299118-6bfe-4fdc-832d-87c5d433fd89",
+      "color": "#9b7ed9",
+      "activityStatus": "recent",
+      "messages24h": 7,
+      "routines": [],
+      "lastActiveAt": "2026-11-12T12:13:44+08:00",
+      "topic": "写作",
+      "avatarShape": "hex",
+      "avatarColor": "violet"
+    },
+    {
+      "id": "82e0be98-7091-4d46-984c-b4f2d6b1d965",
+      "name": "发文",
+      "role": "发文",
+      "status": "busy",
+      "deepLink": "grokbot://app/v1/agent?id=82e0be98-7091-4d46-984c-b4f2d6b1d965",
+      "color": "#d46bc8",
+      "activityStatus": "active",
+      "messages24h": 83,
+      "routines": [],
+      "lastActiveAt": "2026-11-12T16:39:38+08:00",
+      "topic": "发文",
+      "avatarShape": "sparkle",
+      "avatarColor": "magenta"
     }
   ]
 }
