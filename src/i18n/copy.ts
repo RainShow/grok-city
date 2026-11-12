@@ -112,6 +112,21 @@ export function storyTitle(lang: Lang, id: TopicId) {
 export function agentName(lang: Lang, id: AgentId) {
   return AGENT_COPY[id][lang];
 }
+
+const PIPELINE_BOT: Record<AgentId, readonly string[]> = {
+  proto: ['开发'],
+  pumpkin: ['运营'],
+  analysis: ['动态', '行业分析'],
+  grok: ['Grok'],
+  design: ['设计'],
+  post: ['发文'],
+};
+
+/** Visible stand-in for the simulated night-shift roles, when that bot is in the fleet. */
+export function agentLabel(lang: Lang, id: AgentId, names: readonly string[]) {
+  const hit = PIPELINE_BOT[id].find((name) => names.includes(name));
+  return hit ?? agentName(lang, id);
+}
 export function agentRole(lang: Lang, id: AgentId) {
   return lang === 'zh' ? AGENT_COPY[id].roleZh : AGENT_COPY[id].roleEn;
 }
@@ -151,7 +166,7 @@ export function say(lang: Lang, p: Phrase): string {
   const zh = lang === 'zh';
   switch (p.id) {
     case 'boot':
-      return zh ? '夜班开始。不可思议之城亮了。' : 'Night shift. 不可思议之城 — Incredible Space City — is lit.';
+      return zh ? '夜班开始。Grok City 亮了。' : 'Night shift. Grok City is lit.';
     case 'wrap':
       return zh ? '夜班收工，汇总在这儿' : 'Night shift wrapped. The summary is up.';
     case 'restart':
@@ -224,6 +239,7 @@ export function say(lang: Lang, p: Phrase): string {
 }
 
 export interface Dict {
+  brand: string;
   night: string;
   gloss: string;
   online: string;
@@ -245,11 +261,16 @@ export interface Dict {
   approvals: string;
   yourCall: string;
   allQuiet: string;
+  nothingPending: string;
+  exampleTag: string;
   sevenDoors: string;
   atGate: string;
   whichDoor: string;
   gateAsk: string;
   roster: string;
+  rosterPrev: string;
+  rosterNext: string;
+  rosterPage: (n: number, m: number) => string;
   statusIdle: string;
   statusBusy: string;
   statusNeeds: string;
@@ -259,6 +280,12 @@ export interface Dict {
   copiedId: string;
   fleetSample: string;
   fleetSource: (source: string) => string;
+  liveFresh: (hm: string) => string;
+  sampleBadge: string;
+  staleBadge: string;
+  hiddenTag: string;
+  msgs24h: (n: number) => string;
+  atDesk: string;
   webOpen: string;
   pumpkinBtn: string;
   approve: string;
@@ -314,8 +341,9 @@ export interface Dict {
 }
 
 const zh: Dict = {
+  brand: 'Grok City',
   night: '夜班',
-  gloss: '',
+  gloss: 'Grok City',
   online: '在线',
   done: '完成',
   needs: '需要你',
@@ -335,6 +363,8 @@ const zh: Dict = {
   approvals: '审批',
   yourCall: '你的决定',
   allQuiet: '夜班安静，城自己在跑。',
+  nothingPending: '暂无待你决定的事',
+  exampleTag: '示例',
   sevenDoors: '七道门',
   atGate: '过门',
   whichDoor: '今晚主打哪一道门？',
@@ -377,7 +407,7 @@ const zh: Dict = {
   pieces: (n) => `${n} 件`,
   onStreet: '在街上',
   toward: (name) => `→ ${name}`,
-  crumbs: '不可思议空间 · 夜班 · 第一夜',
+  crumbs: 'Grok City · 夜班 · 第一夜',
   summary: (ended, clock) => (ended ? `夜班汇总 · ${clock} 收工` : '夜班汇总 · 还在走'),
   summaryAria: '夜班汇总',
   doorsPicked: (you, all) => `你选的门：${you} / 一共 ${all}`,
@@ -386,6 +416,9 @@ const zh: Dict = {
   autoLine: (n) => `城自己拿的主意：${n}。没有一条真的发出去。`,
   mvp: (name) => `今晚最忙的是${name}。灯还亮着，proto 还在翻。`,
   roster: '花名册',
+  rosterPrev: '上一页',
+  rosterNext: '下一页',
+  rosterPage: (n, m) => `${n} / ${m}`,
   statusIdle: '空闲',
   statusBusy: '忙碌',
   statusNeeds: '需要你',
@@ -395,6 +428,12 @@ const zh: Dict = {
   copiedId: '已复制',
   fleetSample: '数据：fleet.json（样例）',
   fleetSource: (source) => `数据：fleet.json（${source}）`,
+  liveFresh: (hm) => `实时 · 更新于 ${hm}`,
+  sampleBadge: 'Sample',
+  staleBadge: '数据已过期',
+  hiddenTag: '隐藏',
+  msgs24h: (n) => `24h ${n} 条`,
+  atDesk: '在工位',
   webOpen: '打开网页',
   keepWatching: '继续看',
   noLabel: '编号',
@@ -404,8 +443,9 @@ const zh: Dict = {
 };
 
 const en: Dict = {
+  brand: 'Grok City',
   night: 'NIGHT',
-  gloss: 'Incredible Space City',
+  gloss: 'Grok City',
   online: 'Online',
   done: 'Done',
   needs: 'Needs you',
@@ -425,6 +465,8 @@ const en: Dict = {
   approvals: 'Approvals',
   yourCall: 'your call',
   allQuiet: 'All quiet. The city runs the night.',
+  nothingPending: 'Nothing waiting on you.',
+  exampleTag: 'Sample',
   sevenDoors: 'Seven doors',
   atGate: 'At the gate',
   whichDoor: 'Which door tonight?',
@@ -467,7 +509,7 @@ const en: Dict = {
   pieces: (n) => `${n} done`,
   onStreet: 'On the street',
   toward: (name) => `→ ${name}`,
-  crumbs: 'Incredible Space · night shift · night one',
+  crumbs: 'Grok City · night shift · night one',
   summary: (ended, clock) => (ended ? `Night summary · wrapped ${clock}` : 'Night summary · still going'),
   summaryAria: 'Night summary',
   doorsPicked: (you, all) => `Doors you picked: ${you} of ${all}`,
@@ -476,6 +518,9 @@ const en: Dict = {
   autoLine: (n) => `Decisions the city made without you: ${n}. Nothing was actually posted.`,
   mvp: (name) => `Busiest tonight: ${name}. The lights stay on. proto keeps reading.`,
   roster: 'Roster',
+  rosterPrev: 'Previous bots',
+  rosterNext: 'Next bots',
+  rosterPage: (n, m) => `${n} / ${m}`,
   statusIdle: 'Idle',
   statusBusy: 'Busy',
   statusNeeds: 'Needs you',
@@ -485,6 +530,12 @@ const en: Dict = {
   copiedId: 'Copied',
   fleetSample: 'Data: fleet.json (sample)',
   fleetSource: (source) => `Data: fleet.json (${source})`,
+  liveFresh: (hm) => `Live · updated ${hm}`,
+  sampleBadge: 'Sample',
+  staleBadge: 'Data is stale',
+  hiddenTag: 'hidden',
+  msgs24h: (n) => `24h ${n}`,
+  atDesk: 'at the desk',
   webOpen: 'Open page',
   keepWatching: 'Keep watching',
   noLabel: 'no.',

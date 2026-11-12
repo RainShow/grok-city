@@ -1,30 +1,14 @@
 {
-  "updatedAt": "2026-11-02T08:00:00Z",
+  "updatedAt": "2026-11-06T01:23:30Z",
   "source": "sample",
   "bots": [
     {
       "id": "b5c4d18e-58e4-4978-874c-5e9c92fd3ed0",
-      "name": "proto",
+      "name": "开发",
       "role": "想法 → draft PR",
       "status": "busy",
       "deepLink": "grokbot://app/v1/agent?id=b5c4d18e-58e4-4978-874c-5e9c92fd3ed0",
-      "color": "#9ec4e0"
-    },
-    {
-      "id": "eb8e147a-16fb-4000-807f-6909ea9bd9a4",
-      "name": "pumpkin",
-      "role": "内容/发帖准备",
-      "status": "needs_you",
-      "deepLink": "grokbot://app/v1/agent?id=eb8e147a-16fb-4000-807f-6909ea9bd9a4",
-      "color": "#d7c4b2"
-    },
-    {
-      "id": "484dfc32-dfa6-4405-87a8-acab119580ae",
-      "name": "analysis",
-      "role": "晨间 digest",
-      "status": "idle",
-      "deepLink": "grokbot://app/v1/agent?id=484dfc32-dfa6-4405-87a8-acab119580ae",
-      "color": "#e0d2a8"
+      "color": "#9b7ed9"
     },
     {
       "id": "80f758ee-d069-4648-96e6-97690be82cd0",
@@ -35,76 +19,68 @@
       "color": "#c5ced8"
     },
     {
+      "id": "eb8e147a-16fb-4000-807f-6909ea9bd9a4",
+      "name": "运营",
+      "role": "内容/发帖准备",
+      "status": "needs_you",
+      "deepLink": "grokbot://app/v1/agent?id=eb8e147a-16fb-4000-807f-6909ea9bd9a4",
+      "color": "#e8a05c"
+    },
+    {
+      "id": "484dfc32-dfa6-4405-87a8-acab119580ae",
+      "name": "行业分析",
+      "role": "晨间 digest",
+      "status": "idle",
+      "deepLink": "grokbot://app/v1/agent?id=484dfc32-dfa6-4405-87a8-acab119580ae",
+      "color": "#e07070"
+    },
+    {
       "id": "f17f8b85-bef6-4305-af4f-a39dd923a37e",
-      "name": "design",
+      "name": "设计",
       "role": "设计",
       "status": "idle",
       "deepLink": "grokbot://app/v1/agent?id=f17f8b85-bef6-4305-af4f-a39dd923a37e",
-      "color": "#b7c4a4"
-    },
-    {
-      "id": "142b31d2-fcb5-4adb-803c-b921ac699b5f",
-      "name": "post",
-      "role": "发布相关",
-      "status": "busy",
-      "deepLink": "grokbot://app/v1/agent?id=142b31d2-fcb5-4adb-803c-b921ac699b5f",
-      "color": "#c4f93e"
-    },
-    {
-      "id": "1ef929bc-7933-422e-9e03-5654574052d8",
-      "name": "weekly",
-      "role": "设计周报",
-      "status": "idle",
-      "deepLink": "grokbot://app/v1/agent?id=1ef929bc-7933-422e-9e03-5654574052d8",
-      "color": "#8eafc8"
+      "color": "#6b9bd1"
     },
     {
       "id": "332d89ba-38d9-4f9b-bde2-9067ac55b91a",
-      "name": "research",
+      "name": "设计调研",
       "role": "调研",
-      "status": "busy",
+      "status": "idle",
       "deepLink": "grokbot://app/v1/agent?id=332d89ba-38d9-4f9b-bde2-9067ac55b91a",
-      "color": "#d4c89a"
+      "color": "#5ec8d8"
     },
     {
       "id": "39e11a57-6504-413e-abba-62c62ee3e6d0",
-      "name": "ID",
-      "role": "身份",
+      "name": "注册",
+      "role": "账号注册",
       "status": "idle",
       "deepLink": "grokbot://app/v1/agent?id=39e11a57-6504-413e-abba-62c62ee3e6d0",
-      "color": "#b7c0cc"
+      "color": "#5ec8d8"
     },
     {
       "id": "828b8a1a-85e7-4d99-8fc7-4226f4ef89f9",
-      "name": "answer",
-      "role": "回答",
+      "name": "问答",
+      "role": "问答",
       "status": "idle",
       "deepLink": "grokbot://app/v1/agent?id=828b8a1a-85e7-4d99-8fc7-4226f4ef89f9",
-      "color": "#c5d8ea"
+      "color": "#d46bc8"
     },
     {
       "id": "cee53f32-46c9-4b54-a78e-5848f244105a",
-      "name": "book",
-      "role": "书",
-      "status": "offline",
-      "deepLink": "grokbot://app/v1/agent?id=cee53f32-46c9-4b54-a78e-5848f244105a",
-      "color": "#6d7680"
-    },
-    {
-      "id": "e37ad7f5-b25b-4456-8b6d-dabfac30c85a",
-      "name": "chat",
-      "role": "对话",
+      "name": "读书",
+      "role": "知识储备",
       "status": "idle",
-      "deepLink": "grokbot://app/v1/agent?id=e37ad7f5-b25b-4456-8b6d-dabfac30c85a",
-      "color": "#d8cbb8"
+      "deepLink": "grokbot://app/v1/agent?id=cee53f32-46c9-4b54-a78e-5848f244105a",
+      "color": "#6bbf7a"
     },
     {
       "id": "fe40b69b-333f-4be2-8ff4-366b64f7289d",
-      "name": "operation",
-      "role": "操作",
+      "name": "运维",
+      "role": "运维",
       "status": "idle",
       "deepLink": "grokbot://app/v1/agent?id=fe40b69b-333f-4be2-8ff4-366b64f7289d",
-      "color": "#c4b48a"
+      "color": "#e0c35c"
     },
     {
       "id": "8cde9bce-9af5-4012-859b-a2b6a7f1a472",
@@ -112,7 +88,7 @@
       "role": "建 bot",
       "status": "idle",
       "deepLink": "grokbot://app/v1/agent?id=8cde9bce-9af5-4012-859b-a2b6a7f1a472",
-      "color": "#e6e8ea"
+      "color": "#e07070"
     }
   ]
 }

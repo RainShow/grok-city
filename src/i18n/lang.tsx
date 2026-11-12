@@ -36,7 +36,7 @@ export function LangProvider({ children }: { children: ReactNode }) {
   }, []);
   useEffect(() => {
     document.documentElement.lang = lang === 'zh' ? 'zh-CN' : 'en';
-    document.title = lang === 'zh' ? '不可思议之城 · 夜班' : '不可思议之城 · Incredible Space City';
+    document.title = 'Grok City';
   }, [lang]);
   const value = useMemo(() => ({ lang, toggle, t: ui(lang) }), [lang, toggle]);
   return <LangContext.Provider value={value}>{children}</LangContext.Provider>;
