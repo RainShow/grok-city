@@ -1,5 +1,5 @@
 import { useEffect, useLayoutEffect, useRef, useState, type TouchEvent as ReactTouchEvent } from 'react';
-import { orderRoster, relativeActive, type FleetBot, type FleetStatus } from '../game/fleet';
+import { botSummary, orderRoster, relativeActive, type FleetBot, type FleetStatus } from '../game/fleet';
 import { useFleet } from '../game/useFleet';
 import { useI18n } from '../i18n/lang';
 
@@ -201,12 +201,17 @@ function RosterStrip({
                             {bot.hiddenFromSidebar && <em className="ac-hidden">{t.hiddenTag}</em>}
                           </b>
                           <span>{bot.role}</span>
-                          <span className="ac-live">
-                            {bot.lastActiveAt ? relativeActive(lang, bot.lastActiveAt) : label}
-                            {typeof bot.messages24h === 'number' ? ` · ${t.msgs24h(bot.messages24h)}` : ''}
-                          </span>
                         </span>
                         {bot.topic && <span className="ac-topic">{bot.topic}</span>}
+                      </span>
+                      <span className="ac-live">
+                        <span>{bot.lastActiveAt ? relativeActive(lang, bot.lastActiveAt) : label}</span>
+                        {typeof bot.messages24h === 'number' && (
+                          <span className="ac-count">
+                            <span className="ac-sep"> · </span>
+                            {t.msgs24h(bot.messages24h)}
+                          </span>
+                        )}
                       </span>
                     </button>
                   );
@@ -247,34 +252,7 @@ function RosterStrip({
 
 function BotDetail({ bot, note }: { bot: FleetBot; note: string }) {
   const { lang, t } = useI18n();
-  const [copied, setCopied] = useState(false);
-  const label = statusLabel(bot.status, t);
   const heading = bot.title ?? bot.name;
-  const timer = useRef(0);
-
-  useEffect(() => () => window.clearTimeout(timer.current), []);
-
-  const copyId = async () => {
-    let ok = false;
-    try {
-      await navigator.clipboard.writeText(bot.id);
-      ok = true;
-    } catch {
-      const area = document.createElement('textarea');
-      area.value = bot.id;
-      area.setAttribute('readonly', '');
-      area.style.position = 'fixed';
-      area.style.left = '-9999px';
-      document.body.appendChild(area);
-      area.select();
-      ok = document.execCommand('copy');
-      area.remove();
-    }
-    if (!ok) return;
-    setCopied(true);
-    window.clearTimeout(timer.current);
-    timer.current = window.setTimeout(() => setCopied(false), 1600);
-  };
 
   return (
     <div className={`roster-detail status-${bot.status}`} role="region" aria-label={`${heading} · ${bot.role}`} data-testid="bot-detail">
@@ -282,32 +260,20 @@ function BotDetail({ bot, note }: { bot: FleetBot; note: string }) {
         <span className="ac-pip" style={{ background: bot.color ?? '#8b959e' }} />
         <span className={`ac-dot activity-${bot.activityStatus ?? 'idle'}`} />
         <b>{heading}</b>
-        <span className="roster-role"> · {bot.role}</span>
         {bot.hiddenFromSidebar && <em className="ac-hidden">{t.hiddenTag}</em>}
-        {bot.topic && <span className="ac-topic">{bot.topic}</span>}
-        <span className={`ac-mode ${bot.status}`}>
-          {bot.lastActiveAt ? relativeActive(lang, bot.lastActiveAt) : label}
-          {typeof bot.messages24h === 'number' ? ` · ${t.msgs24h(bot.messages24h)}` : ''}
-        </span>
       </div>
-      <div className="roster-idline">
-        <code className="roster-id" data-testid="bot-id">
-          {bot.id}
-        </code>
-        <code className="roster-link">{bot.deepLink}</code>
-        <div className="roster-actions">
-          <a className="btn-approve" href={bot.deepLink} data-testid="open-chat">
-            {t.openChat}
+      <p className="roster-summary" data-testid="bot-summary">
+        {botSummary(lang, bot)}
+      </p>
+      <div className="roster-actions">
+        <a className="btn-approve" href={bot.deepLink} data-testid="open-chat">
+          {t.openChat}
+        </a>
+        {bot.webLink && (
+          <a className="ghost-btn" href={bot.webLink} target="_blank" rel="noreferrer">
+            {t.webOpen}
           </a>
-          <button type="button" className={`ghost-btn ${copied ? 'is-copied' : ''}`} data-testid="copy-id" onClick={copyId}>
-            {copied ? t.copiedId : t.copyId}
-          </button>
-          {bot.webLink && (
-            <a className="ghost-btn" href={bot.webLink} target="_blank" rel="noreferrer">
-              {t.webOpen}
-            </a>
-          )}
-        </div>
+        )}
       </div>
       <div className="roster-note">{note}</div>
     </div>

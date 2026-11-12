@@ -388,7 +388,7 @@ function Dynamic({ rot, labels }: { rot: number; labels: boolean }) {
       </g>
     ));
 
-  const bubble = s.activeBubble;
+  const bubble = fleet.source === 'live' ? null : s.activeBubble;
   let bubbleEl: ReactNode = null;
   if (bubble) {
     const b = BUILDINGS.find((x) => x.id === bubble.building)!;

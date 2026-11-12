@@ -818,14 +818,21 @@ button { cursor: pointer; }
 }
 
 .ac-live {
+  display: block;
+  margin-top: 4px;
   font-family: var(--mono);
   font-size: 10px;
+  line-height: 1.35;
   color: var(--ice);
+  white-space: nowrap;
 }
 
 .ac-topic {
   align-self: flex-start;
-  max-width: 72px;
+  max-width: 56px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
   padding: 2px 5px;
   border: 1px solid rgba(196, 249, 62, 0.45);
   border-radius: 2px;
@@ -849,8 +856,17 @@ button { cursor: pointer; }
 .agent-card.status-offline .ac-pip { background: #5c656e; }
 
 .ac-name { display: flex; flex-direction: column; min-width: 0; line-height: 1.15; flex: 1; }
-.ac-name b { font-size: 13px; font-weight: 500; }
+.ac-name b { font-size: 13px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .ac-name span { font-size: 10px; color: var(--ink-soft); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+@media (max-width: 420px) {
+  .ac-count { display: block; }
+  .ac-sep { display: none; }
+  .ac-top { flex-wrap: wrap; }
+  .ac-name { flex: 1 0 calc(100% - 20px); }
+  .ac-name b { overflow: visible; text-overflow: unset; }
+  .ac-topic { max-width: 100%; flex: 1 1 100%; }
+}
 
 .ac-mode {
   margin-left: auto;
@@ -896,6 +912,13 @@ button { cursor: pointer; }
   white-space: nowrap;
 }
 
+.roster-summary {
+  margin: 8px 0 0;
+  color: var(--ink);
+  font-size: 13px;
+  line-height: 1.45;
+}
+
 .roster-idline {
   display: flex;
   align-items: center;
@@ -921,7 +944,7 @@ button { cursor: pointer; }
   color: var(--ink-soft);
 }
 
-.roster-actions { display: flex; gap: 8px; flex-wrap: wrap; margin-left: auto; }
+.roster-actions { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 8px; }
 .roster-actions a { text-decoration: none; display: inline-flex; align-items: center; justify-content: center; }
 
 .roster-note, .roster-foot {

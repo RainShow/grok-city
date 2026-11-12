@@ -211,6 +211,43 @@ export function relativeActive(lang: 'zh' | 'en', iso: string | undefined, now =
   return lang === 'zh' ? `${days} 天前` : `${days}d ago`;
 }
 
+/** Role string only. "想法 → draft PR" reads as turning one into the other. */
+function dutyPhrase(lang: 'zh' | 'en', role: string) {
+  const match = role.trim().match(/^(.+?)\s*(?:→|->)\s*(.+)$/);
+  if (!match) return role.trim();
+  const from = match[1].trim();
+  const to = match[2].trim();
+  const gap = /^[A-Za-z0-9]/.test(to) ? ' ' : '';
+  return lang === 'zh' ? `把${from}做成${gap}${to}` : `${from} → ${to}`;
+}
+
+function idleFor(lang: 'zh' | 'en', iso: string | undefined, now: number) {
+  const stamp = iso ? Date.parse(iso) : NaN;
+  if (!Number.isFinite(stamp)) return lang === 'zh' ? '未活跃' : 'inactive';
+  const days = Math.floor(Math.max(0, now - stamp) / 86400000);
+  if (days < 1) return lang === 'zh' ? '今天未活跃' : 'inactive today';
+  return lang === 'zh' ? `${days} 天未活跃` : `inactive ${days}d`;
+}
+
+/** One sentence from role and activity. No topics, routines, or invented work. */
+export function botSummary(lang: 'zh' | 'en', bot: FleetBot, now = Date.now()) {
+  const duty = dutyPhrase(lang, bot.role);
+  if ((bot.activityStatus ?? 'idle') === 'idle') {
+    const quiet = idleFor(lang, bot.lastActiveAt, now);
+    return lang === 'zh' ? `负责${duty}，${quiet}。` : `Handles ${duty}, ${quiet}.`;
+  }
+  const when = relativeActive(lang, bot.lastActiveAt, now);
+  const count = typeof bot.messages24h === 'number' ? bot.messages24h : null;
+  if (lang === 'zh') {
+    const active = when ? `${when}活跃` : '活跃';
+    const msgs = count == null ? '' : `，24 小时内 ${count} 条消息`;
+    return `负责${duty}，${active}${msgs}。`;
+  }
+  const active = when ? `active ${when}` : 'active';
+  const msgs = count == null ? '' : `, ${count} messages in 24h`;
+  return `Handles ${duty}, ${active}${msgs}.`;
+}
+
 export async function loadFleet(): Promise<FleetFile> {
   try {
     const res = await fetch(`./fleet.json?t=${Date.now()}`, { cache: 'no-store' });

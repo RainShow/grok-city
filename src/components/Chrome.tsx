@@ -34,10 +34,12 @@ export function Header() {
             <span className="shift">[ {t.night} ]</span>
           </h1>
           {t.gloss && <div className="gloss">{t.gloss}</div>}
-          <div className="verse">
-            <span style={{ color: verse.color }}>{seriesName(lang, verse.id)}</span>
-            <span>{lang === 'zh' ? `「${seriesVerse(lang, verse.id)}」` : `“${seriesVerse(lang, verse.id)}”`}</span>
-          </div>
+          {fleet.source !== 'live' && (
+            <div className="verse">
+              <span style={{ color: verse.color }}>{seriesName(lang, verse.id)}</span>
+              <span>{lang === 'zh' ? `「${seriesVerse(lang, verse.id)}」` : `“${seriesVerse(lang, verse.id)}”`}</span>
+            </div>
+          )}
         </div>
       </div>
       <div className="header-pills">
