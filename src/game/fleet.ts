@@ -42,7 +42,7 @@ const ACTIVITIES: readonly ActivityStatus[] = ['active', 'recent', 'idle', 'sche
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const ACTIVITY_RANK: Record<ActivityStatus, number> = { active: 0, recent: 1, scheduled: 2, idle: 3 };
 
-export const STALE_AFTER_MS = 2 * 60 * 60 * 1000;
+export const STALE_AFTER_MS = 8 * 60 * 60 * 1000;
 export const FLEET_REFRESH_MS = 5 * 60 * 1000;
 
 function canonicalDeepLink(id: string) {
@@ -160,21 +160,42 @@ export function isFleetStale(updatedAt: string, now = Date.now()) {
   return now - stamp > STALE_AFTER_MS;
 }
 
-export function taipeiHM(iso: string) {
-  const stamp = Date.parse(iso);
-  if (!Number.isFinite(stamp)) return '--:--';
+function taipeiParts(stamp: number) {
   try {
-    return new Intl.DateTimeFormat('en-GB', {
+    const parts = new Intl.DateTimeFormat('en-GB', {
       timeZone: 'Asia/Taipei',
+      year: 'numeric',
+      month: 'numeric',
+      day: 'numeric',
       hour: '2-digit',
       minute: '2-digit',
       hourCycle: 'h23',
-    }).format(new Date(stamp));
+    }).formatToParts(new Date(stamp));
+    const bag: Record<string, string> = {};
+    for (const part of parts) bag[part.type] = part.value;
+    return bag;
   } catch {
     const shifted = new Date(stamp + 8 * 3600 * 1000);
     const pad = (n: number) => String(n).padStart(2, '0');
-    return `${pad(shifted.getUTCHours())}:${pad(shifted.getUTCMinutes())}`;
+    return {
+      year: String(shifted.getUTCFullYear()),
+      month: String(shifted.getUTCMonth() + 1),
+      day: String(shifted.getUTCDate()),
+      hour: pad(shifted.getUTCHours()),
+      minute: pad(shifted.getUTCMinutes()),
+    };
   }
+}
+
+/** Taipei clock. Today is HH:MM; any other day is M/D HH:MM. */
+export function taipeiHM(iso: string, now = Date.now()) {
+  const stamp = Date.parse(iso);
+  if (!Number.isFinite(stamp)) return '--:--';
+  const when = taipeiParts(stamp);
+  const today = taipeiParts(now);
+  const hm = `${when.hour}:${when.minute}`;
+  if (when.year === today.year && when.month === today.month && when.day === today.day) return hm;
+  return `${when.month}/${when.day} ${hm}`;
 }
 
 export function relativeActive(lang: 'zh' | 'en', iso: string | undefined, now = Date.now()) {
