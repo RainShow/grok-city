@@ -372,6 +372,20 @@ function textWidth(text: string, lang: string) {
   return lang === 'zh' ? [...text].length * 13 + 28 : text.length * 6.4 + 28;
 }
 
+function SpeechBubble({ x, y, text, lang, hot }: { x: number; y: number; text: string; lang: string; hot?: boolean }) {
+  const w = textWidth(text, lang);
+  const fill = '#0b0d10';
+  const edge = hot ? '#c4f93e' : '#c5d8ea';
+  return (
+    <g transform={`translate(${x} ${y})`} className={hot ? 'bubble pulse' : 'bubble'}>
+      <rect x={-w / 2} y={-14} width={w} height={26} rx={2} fill={fill} stroke={edge} strokeWidth={1} />
+      <path d={`M-6,12 L0,20 L6,12`} fill={fill} stroke={edge} strokeWidth={1} />
+      <line x1={-5} y1={12} x2={5} y2={12} stroke={fill} strokeWidth={2} />
+      <text x={0} y={2} textAnchor="middle" className="bubble-text">{text}</text>
+    </g>
+  );
+}
+
 function Dynamic({ rot, labels }: { rot: number; labels: boolean }) {
   const sim = useSimFrame();
   const fleet = useFleet();
@@ -388,24 +402,18 @@ function Dynamic({ rot, labels }: { rot: number; labels: boolean }) {
       </g>
     ));
 
-  const bubble = fleet.source === 'live' ? null : s.activeBubble;
   let bubbleEl: ReactNode = null;
-  if (bubble) {
+  if (fleet.source === 'live') {
+    bubbleEl = positions
+      .filter((p) => p.activity === 'active')
+      .map(({ bot, x, y }) => (
+        <SpeechBubble key={`b-${bot.id}`} x={x} y={y - 92} text={bot.topic ? `${bot.name} · ${bot.topic}` : bot.name} lang={lang} />
+      ));
+  } else if (s.activeBubble) {
+    const bubble = s.activeBubble;
     const b = BUILDINGS.find((x) => x.id === bubble.building)!;
     const dp = P(b.door[0] + 0.5, b.door[1] + 0.5, 0, rot);
-    const bubbleText = say(lang, bubble.text);
-    const needs = bubble.text.id === 'needsYou';
-    const w = textWidth(bubbleText, lang);
-    const fill = '#0b0d10';
-    const edge = needs ? '#c4f93e' : '#c5d8ea';
-    bubbleEl = (
-      <g transform={`translate(${dp.x} ${dp.y - 78})`} className={needs ? 'bubble pulse' : 'bubble'}>
-        <rect x={-w / 2} y={-14} width={w} height={26} rx={2} fill={fill} stroke={edge} strokeWidth={1} />
-        <path d={`M-6,12 L0,20 L6,12`} fill={fill} stroke={edge} strokeWidth={1} />
-        <line x1={-5} y1={12} x2={5} y2={12} stroke={fill} strokeWidth={2} />
-        <text x={0} y={2} textAnchor="middle" className="bubble-text">{bubbleText}</text>
-      </g>
-    );
+    bubbleEl = <SpeechBubble x={dp.x} y={dp.y - 78} text={say(lang, bubble.text)} lang={lang} hot={bubble.text.id === 'needsYou'} />;
   }
 
   return (
@@ -465,11 +473,16 @@ function Callout({ b, rot }: { b: Building; rot: number }) {
     const rank = (bot: FleetBot) => (bot.activityStatus === 'active' ? 0 : bot.activityStatus === 'recent' ? 1 : 2);
     return rank(a) - rank(c);
   })[0];
+  const live = fleet.source === 'live';
   const status = !lead
-    ? say(lang, { id: 'quiet' })
-    : lead.activityStatus === 'active'
-      ? `${lead.name} · ${lead.topic ?? t.onStreet}`
-      : lead.activityStatus === 'recent'
+    ? live
+      ? ''
+      : say(lang, { id: 'quiet' })
+    : live
+      ? lead.topic
+        ? `${lead.name} · ${lead.topic}`
+        : lead.name
+      : lead.activityStatus === 'active' || lead.activityStatus === 'recent'
         ? `${lead.name} · ${lead.topic ?? t.onStreet}`
         : `${lead.name} · ${t.atDesk}`;
   const dot = lead?.activityStatus === 'active' ? '#c4f93e' : lead?.activityStatus === 'recent' ? '#c5d8ea' : '#5c656e';
@@ -488,11 +501,13 @@ function Callout({ b, rot }: { b: Building; rot: number }) {
         <text x={5} y={8} className="callout-no">{t.noLabel} {b.no}</text>
         <text x={w / 2} y={20} textAnchor="middle" className="callout-name">{buildingName(lang, b.id)}</text>
         <text x={w / 2} y={40} textAnchor="middle" className="callout-tag">{buildingTag(lang, b.id)}</text>
-        <g transform={`translate(${(w - pw) / 2} 48)`} className={lead?.activityStatus === 'active' ? 'pulse' : undefined}>
-          <rect width={pw} height={16} rx={2} fill="#10141a" stroke="rgba(232,236,239,0.16)" strokeWidth={0.7} />
-          <circle cx={9} cy={8} r={3.2} fill={dot} />
-          <text x={16} y={11.5} className="callout-pill">{pillText}</text>
-        </g>
+        {full && (
+          <g transform={`translate(${(w - pw) / 2} 48)`} className={lead?.activityStatus === 'active' ? 'pulse' : undefined}>
+            <rect width={pw} height={16} rx={2} fill="#10141a" stroke="rgba(232,236,239,0.16)" strokeWidth={0.7} />
+            <circle cx={9} cy={8} r={3.2} fill={dot} />
+            <text x={16} y={11.5} className="callout-pill">{pillText}</text>
+          </g>
+        )}
       </g>
     </g>
   );

@@ -460,6 +460,16 @@ button { cursor: pointer; }
   gap: 8px;
 }
 
+.example-tag {
+  padding: 1px 6px;
+  border: 1px dashed rgba(232, 236, 239, 0.55);
+  border-radius: 2px;
+  font-style: normal;
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  color: var(--ink);
+}
+
 .section-aside {
   margin-left: auto;
   font-family: var(--mono);
@@ -596,7 +606,7 @@ button { cursor: pointer; }
   animation: slidein 0.3s ease-out;
 }
 
-.log-time { font-family: var(--mono); color: #6e787f; font-variant-numeric: tabular-nums; font-size: 10px; letter-spacing: 0.04em; }
+.log-time { font-family: var(--mono); color: #6e787f; font-variant-numeric: tabular-nums; font-size: 10px; letter-spacing: 0.04em; white-space: nowrap; }
 .who-you .log-text b { color: var(--lime); }
 
 .story-now { font-size: 12px; line-height: 1.45; min-height: 34px; }

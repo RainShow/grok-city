@@ -187,6 +187,50 @@ function taipeiParts(stamp: number) {
   }
 }
 
+const ACTIVITY_WORD: Record<ActivityStatus, { zh: string; en: string }> = {
+  active: { zh: '活跃', en: 'active' },
+  recent: { zh: '最近', en: 'recent' },
+  idle: { zh: '闲置', en: 'idle' },
+  scheduled: { zh: '定时', en: 'scheduled' },
+};
+
+export interface FleetLogLine {
+  key: string;
+  time: string;
+  text: string;
+  color: string;
+}
+
+/** One sync line, then one line per bot, newest lastActiveAt first. No extra prose. */
+export function liveLog(lang: 'zh' | 'en', fleet: FleetFile, now = Date.now()): FleetLogLine[] {
+  const hm = taipeiHM(fleet.updatedAt, now);
+  const sync = lang === 'zh' ? `同步 · 快照更新于 ${hm}` : `Sync · snapshot updated ${hm}`;
+  const ranked = fleet.bots
+    .map((bot, index) => ({ bot, index }))
+    .sort((a, b) => {
+      const stamp = (iso?: string) => {
+        const value = iso ? Date.parse(iso) : NaN;
+        return Number.isFinite(value) ? value : Number.NEGATIVE_INFINITY;
+      };
+      const diff = stamp(b.bot.lastActiveAt) - stamp(a.bot.lastActiveAt);
+      return diff !== 0 ? diff : a.index - b.index;
+    });
+  const lines: FleetLogLine[] = [{ key: 'sync', time: hm, text: sync, color: '#c5d8ea' }];
+  for (const { bot } of ranked) {
+    const word = bot.activityStatus ? ACTIVITY_WORD[bot.activityStatus][lang] : '';
+    let text = word ? `${bot.name} ${word}` : bot.name;
+    if (typeof bot.messages24h === 'number') text += lang === 'zh' ? ` · 24h ${bot.messages24h} 条` : ` · 24h ${bot.messages24h}`;
+    if (bot.topic) text += ` · ${bot.topic}`;
+    lines.push({
+      key: bot.id,
+      time: bot.lastActiveAt ? taipeiHM(bot.lastActiveAt, now) : '--:--',
+      text,
+      color: bot.color ?? '#8b959e',
+    });
+  }
+  return lines;
+}
+
 /** Taipei clock. Today is HH:MM; any other day is M/D HH:MM. */
 export function taipeiHM(iso: string, now = Date.now()) {
   const stamp = Date.parse(iso);

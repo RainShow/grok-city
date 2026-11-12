@@ -261,6 +261,8 @@ export interface Dict {
   approvals: string;
   yourCall: string;
   allQuiet: string;
+  nothingPending: string;
+  exampleTag: string;
   sevenDoors: string;
   atGate: string;
   whichDoor: string;
@@ -361,6 +363,8 @@ const zh: Dict = {
   approvals: '审批',
   yourCall: '你的决定',
   allQuiet: '夜班安静，城自己在跑。',
+  nothingPending: '暂无待你决定的事',
+  exampleTag: '示例',
   sevenDoors: '七道门',
   atGate: '过门',
   whichDoor: '今晚主打哪一道门？',
@@ -461,6 +465,8 @@ const en: Dict = {
   approvals: 'Approvals',
   yourCall: 'your call',
   allQuiet: 'All quiet. The city runs the night.',
+  nothingPending: 'Nothing waiting on you.',
+  exampleTag: 'Sample',
   sevenDoors: 'Seven doors',
   atGate: 'At the gate',
   whichDoor: 'Which door tonight?',

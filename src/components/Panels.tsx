@@ -4,6 +4,7 @@ import { useSim } from '../game/useSim';
 import { formatClock, formatCompact } from '../format';
 import { POSTS_PER_DAY, type Prompt, type SimState } from '../game/sim';
 import { agentLabel, featuring, say, seriesName, seriesVerse, stageLabel, storyDraft, storyTitle } from '../i18n/copy';
+import { liveLog } from '../game/fleet';
 import { useFleet } from '../game/useFleet';
 import { useI18n } from '../i18n/lang';
 
@@ -27,16 +28,20 @@ export function RightPanel() {
 
 function NeedsYou() {
   const sim = useSim();
+  const fleet = useFleet();
   const { t } = useI18n();
-  const prompts = sim.state.prompts;
+  const live = fleet.source === 'live';
+  const prompts = live ? [] : sim.state.prompts;
   return (
-    <section className="section needs">
+    <section className="section needs" data-testid="approvals">
       <h2>
         <span className="hud">[ {t.approvals} ]</span>
-        {prompts.length > 0 && <span className="badge">{prompts.length}</span>}
-        <span className="section-aside">{t.yourCall}</span>
+        {!live && prompts.length > 0 && <span className="badge">{prompts.length}</span>}
+        {!live && <span className="section-aside">{t.yourCall}</span>}
       </h2>
-      {prompts.length === 0 ? (
+      {live ? (
+        <div className="empty" data-testid="approvals-empty">{t.nothingPending}</div>
+      ) : prompts.length === 0 ? (
         <div className="empty">{t.allQuiet}</div>
       ) : (
         prompts.map((p) => (
@@ -132,15 +137,24 @@ function Activity() {
   const fleet = useFleet();
   const { lang, t } = useI18n();
   const names = fleet.bots.map((bot) => bot.name);
+  const live = fleet.source === 'live';
+  const lines = live ? liveLog(lang, fleet) : null;
   return (
     <section className="section activity">
       <h2>
         <span className="hud">[ CITY.LOG ]</span>
-        <span className="live-dot tiny" />
-        <span className="section-aside">{t.live}</span>
+        {live ? null : <em className="example-tag">{t.exampleTag}</em>}
       </h2>
-      <ol className="log">
-        {sim.state.log.map((e) => {
+      <ol className="log" data-testid="city-log">
+        {lines
+          ? lines.map((line) => (
+              <li key={line.key} className="log-item">
+                <span className="log-time">{line.time}</span>
+                <span className="dot" style={{ background: line.color }} />
+                <span className="log-text">{line.text}</span>
+              </li>
+            ))
+          : sim.state.log.map((e) => {
           const color = e.who === 'you' ? '#c4f93e' : e.who === 'city' ? '#8b959e' : AGENT_BY_ID[e.who].color;
           const name = e.who === 'you' ? t.whoYou : e.who === 'city' ? t.whoCity : agentLabel(lang, e.who, names);
           return (
@@ -179,6 +193,7 @@ function Pipeline() {
     <section className="section pipeline">
       <h2>
         <span className="hud">[ {t.mission} ]</span>
+        {fleet.source === 'live' && <em className="example-tag">{t.exampleTag}</em>}
         <span className="section-aside">
           {s.metrics.posts}/{POSTS_PER_DAY} {t.sent}
         </span>
@@ -234,12 +249,14 @@ function Sparkline({ data }: { data: number[] }) {
 
 function Today() {
   const sim = useSim();
+  const fleet = useFleet();
   const { t } = useI18n();
   const m = sim.state.metrics;
   return (
     <section className="section today">
       <h2>
         <span className="hud">[ {t.stats} ]</span>
+        {fleet.source === 'live' && <em className="example-tag">{t.exampleTag}</em>}
         <span className="section-aside">{t.sample}</span>
       </h2>
       <div className="metric big">
