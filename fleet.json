@@ -1,6 +1,6 @@
 {
-  "updatedAt": "2026-11-12T18:11:37+08:00",
-  "generatedAt": "2026-11-12T18:11:37+08:00",
+  "updatedAt": "2026-11-13T12:11:49+08:00",
+  "generatedAt": "2026-11-13T12:11:49+08:00",
   "source": "live",
   "bots": [
     {
@@ -26,9 +26,9 @@
       "deepLink": "grokbot://app/v1/agent?id=80f758ee-d069-4648-96e6-97690be82cd0",
       "color": "#c5ced8",
       "activityStatus": "recent",
-      "messages24h": 39,
+      "messages24h": 33,
       "routines": [],
-      "lastActiveAt": "2026-11-12T13:18:02+08:00",
+      "lastActiveAt": "2026-11-13T11:21:17+08:00",
       "topic": "团队协调",
       "avatarShape": "blob",
       "avatarColor": "black"
@@ -41,9 +41,9 @@
       "deepLink": "grokbot://app/v1/agent?id=eb8e147a-16fb-4000-807f-6909ea9bd9a4",
       "color": "#e8a05c",
       "activityStatus": "recent",
-      "messages24h": 47,
+      "messages24h": 25,
       "routines": [],
-      "lastActiveAt": "2026-11-12T11:41:46+08:00",
+      "lastActiveAt": "2026-11-13T11:34:47+08:00",
       "topic": "内容准备",
       "avatarShape": "pumpkin",
       "avatarColor": "orange"
@@ -55,11 +55,10 @@
       "status": "idle",
       "deepLink": "grokbot://app/v1/agent?id=484dfc32-dfa6-4405-87a8-acab119580ae",
       "color": "#e07070",
-      "activityStatus": "recent",
-      "messages24h": 1,
+      "activityStatus": "idle",
+      "messages24h": 0,
       "routines": [],
       "lastActiveAt": "2026-11-12T09:52:44+08:00",
-      "topic": "晨报",
       "avatarShape": "tablet",
       "avatarColor": "red"
     },
@@ -102,9 +101,9 @@
       "deepLink": "grokbot://app/v1/agent?id=39e11a57-6504-413e-abba-62c62ee3e6d0",
       "color": "#5ec8d8",
       "activityStatus": "recent",
-      "messages24h": 60,
+      "messages24h": 126,
       "routines": [],
-      "lastActiveAt": "2026-11-12T16:27:30+08:00",
+      "lastActiveAt": "2026-11-13T11:52:09+08:00",
       "topic": "账号注册",
       "avatarShape": "wedge",
       "avatarColor": "cyan"
@@ -164,7 +163,7 @@
       "activityStatus": "recent",
       "messages24h": 4,
       "routines": [],
-      "lastActiveAt": "2026-11-12T09:30:20+08:00",
+      "lastActiveAt": "2026-11-13T09:09:04+08:00",
       "topic": "建 bot",
       "avatarShape": "teardrop",
       "avatarColor": "red"
@@ -177,7 +176,7 @@
       "deepLink": "grokbot://app/v1/agent?id=81299118-6bfe-4fdc-832d-87c5d433fd89",
       "color": "#9b7ed9",
       "activityStatus": "recent",
-      "messages24h": 7,
+      "messages24h": 4,
       "routines": [],
       "lastActiveAt": "2026-11-12T12:13:44+08:00",
       "topic": "写作",
@@ -192,12 +191,27 @@
       "deepLink": "grokbot://app/v1/agent?id=82e0be98-7091-4d46-984c-b4f2d6b1d965",
       "color": "#d46bc8",
       "activityStatus": "recent",
-      "messages24h": 83,
+      "messages24h": 13,
       "routines": [],
       "lastActiveAt": "2026-11-12T16:39:38+08:00",
       "topic": "发文",
       "avatarShape": "sparkle",
       "avatarColor": "magenta"
+    },
+    {
+      "id": "d7871eee-9e97-469d-9be4-eec7922f6921",
+      "name": "周报",
+      "role": "周报",
+      "status": "idle",
+      "deepLink": "grokbot://app/v1/agent?id=d7871eee-9e97-469d-9be4-eec7922f6921",
+      "color": "#9b7ed9",
+      "activityStatus": "recent",
+      "messages24h": 20,
+      "routines": [],
+      "lastActiveAt": "2026-11-13T00:34:03+08:00",
+      "topic": "周报",
+      "avatarShape": "cloud",
+      "avatarColor": "violet"
     }
   ]
 }
